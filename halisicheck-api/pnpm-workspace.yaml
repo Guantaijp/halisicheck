@@ -1,0 +1,7 @@
+allowBuilds:
+  # Analytics pinger — no build needed.
+  '@scarf/scarf': false
+  # Native msgpack codec used by BullMQ; worth building for queue throughput.
+  msgpackr-extract: true
+  # OCR fallback for scanned PDFs.
+  tesseract.js: true

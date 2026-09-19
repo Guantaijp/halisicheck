@@ -1,0 +1,40 @@
+# Local dependencies for HalisiCheck. Start with: docker compose up -d
+#
+# Host ports are deliberately offset (5433/6380) so this stack can run
+# alongside another project already holding the default Postgres and Redis
+# ports. Inside the compose network the services still use 5432/6379.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: halisicheck-postgres
+    environment:
+      POSTGRES_USER: halisi
+      POSTGRES_PASSWORD: halisi
+      POSTGRES_DB: halisicheck
+    ports:
+      - '5433:5432'
+    volumes:
+      - halisicheck-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U halisi -d halisicheck']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: halisicheck-redis
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '6380:6379'
+    volumes:
+      - halisicheck-redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  halisicheck-pgdata:
+  halisicheck-redisdata:
